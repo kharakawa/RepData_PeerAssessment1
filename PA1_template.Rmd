@@ -6,7 +6,7 @@
 The data file is extracted from zip archive by unz() function, then it is loaded into a data frame by read.csv() function.
 
 ```{r}
-data = read.csv(unz('activity.zip', 'activity.csv'))
+data <- read.csv(unz('activity.zip', 'activity.csv'))
 dim(data)
 head(data)
 ```
@@ -25,7 +25,7 @@ library(ggplot2)
 library(lattice)
 
 # sum steps by date.
-daily_steps = tapply(data$steps, data$date, sum)
+daily_steps <- tapply(data$steps, data$date, sum)
 
 # then plot a histogram with 14 bins.
 histogram(daily_steps, type="count", nint=14, col='steelblue')
@@ -35,8 +35,8 @@ Then, mean and median is calculated by corresponding functions.
 
 ```{r}
 # calculat mean and median of total number of steps taken per day
-mean_daily_steps = mean(daily_steps, na.rm=T)
-median_daily_steps = median(daily_steps, na.rm=T)
+mean_daily_steps <- mean(daily_steps, na.rm=T)
+median_daily_steps <- median(daily_steps, na.rm=T)
 
 ```
 
@@ -50,8 +50,8 @@ The number of steps is averaged across all days.
 
 ```{r}
 # calculate averaged steps of 5-minute interval, then turn it into a data frame.
-average_steps = tapply(data$steps, data$interval, mean, na.rm=T)
-average_steps_df = data.frame(interval=as.integer(names(average_steps)), average_steps=as.numeric(average_steps))
+average_steps <- tapply(data$steps, data$interval, mean, na.rm=T)
+average_steps_df <- data.frame(interval=as.integer(names(average_steps)), average_steps=as.numeric(average_steps))
 
 # make a time series plot of the averaged steps of 5-minute interval.
 xyplot(average_steps ~ interval, data=average_steps_df, type='l', col='steelblue', lwd=2)
@@ -62,8 +62,8 @@ There is a high peak in the plot.
 
 ```{r}
 
-max_case_no = which.max(average_steps_df$average_steps)
-max_case = average_steps_df[max_case_no,]
+max_case_no <- which.max(average_steps_df$average_steps)
+max_case <- average_steps_df[max_case_no,]
 
 ```
 
@@ -74,7 +74,7 @@ Tha peak is at the interval **`r max_case$interval`**, and its value (maximun st
 The number of missing value in the dataset can be caluclulated by the following code,
 
 ```{r}
-total_na = sum(is.na(data$steps))
+total_na <- sum(is.na(data$steps))
 ```
 
 and the result is **`r total_na`**. This is about **`r sprintf("%0.1f", 100 * total_na / nrow(data))`%** of whole dataset.
@@ -83,23 +83,23 @@ To impute these missing values, tha averaged number of steps of 5-minute interva
 
 ```{r}
 # join original data with averaged 5-minute data, then reorder the result.
-filled_data = merge(data, average_steps_df, by='interval')
-filled_data = filled_data[with(filled_data, order(date, interval)),]
+filled_data <- merge(data, average_steps_df, by='interval')
+filled_data <- filled_data[with(filled_data, order(date, interval)),]
 
 # fill NA of steps by corresponding average_steps.
-na_steps = is.na(filled_data$steps)
+na_steps <- is.na(filled_data$steps)
 filled_data$steps[na_steps] <- filled_data$average_steps[na_steps]
 
 # drop unnecessary columns, and mimic the original row names.
-filled_data = filled_data[colnames(data)]
-rownames(filled_data) = rownames(data)
+filled_data <- filled_data[colnames(data)]
+rownames(filled_data) <- rownames(data)
 ```
 
 Then a histogram of the total number of steps taken each day is made. The following is the plot.
 
 ```{r}
 # plot a histogram of the total number of steps per day.
-filled_daily_steps = tapply(filled_data$steps, filled_data$date, sum)
+filled_daily_steps <- tapply(filled_data$steps, filled_data$date, sum)
 histogram(filled_daily_steps, type="count", nint=14, col='steelblue')
 ```
 
@@ -108,8 +108,8 @@ This time, na.rm is not needed.
 
 ```{r}
 # calculat mean and median of total number of steps taken per day
-filled_mean_daily_steps = mean(filled_daily_steps)
-filled_median_daily_steps = median(filled_daily_steps)
+filled_mean_daily_steps <- mean(filled_daily_steps)
+filled_median_daily_steps <- median(filled_daily_steps)
 ```
 
 Resulting mean and median of total (filled) number of steps per day is **`r filled_mean_daily_steps`** is **`r filled_median_daily_steps`**, respectively.
@@ -123,16 +123,16 @@ A new factor variable "daytype", which indicates whether the date is "weekday" o
 
 ```{r}
 # set locale
-lc = Sys.setlocale(locale="en_US.UTF-8")
+lc <- Sys.setlocale(locale="en_US.UTF-8")
 
 # function to convert datestring to daytype (e.g. "weekend", or "weekday")
-date_to_daytype = function(date_string, format="%Y-%m-%d") {
-    weekday = weekdays(strptime(date_string, format))
+date_to_daytype <- function(date_string, format="%Y-%m-%d") {
+    weekday <- weekdays(strptime(date_string, format))
     if (weekday %in% c("Saturday", "Sunday")) "weekend" else "weekday"
 }
 
 # append new 'daytype' column
-filled_data = transform(filled_data,
+filled_data <- transform(filled_data,
                         daytype=factor(sapply(date, FUN=date_to_daytype, simplify=T, USE.NAMES=F)))
                                            
 ```
@@ -143,7 +143,7 @@ Then a panel plot with two time series plot is made. One plot shows the number o
 library(data.table)
 # turn filled data into data.table, then calculate averaged steps of 5-minute interval,
 # grouped by daytype.
-filled_average_steps_dt = data.table(filled_data)[, list(average_steps=mean(steps)), by=list(interval, daytype)]
+filled_average_steps_dt <- data.table(filled_data)[, list(average_steps=mean(steps)), by=list(interval, daytype)]
 
 # then, make a panel plot of the time series
 xyplot(average_steps~interval | daytype, data=filled_average_steps_dt,
@@ -152,4 +152,4 @@ xyplot(average_steps~interval | daytype, data=filled_average_steps_dt,
 
 ```
 
-It seems that the there are differences in activity patterns between weekdays and weekends.
+It seems that there are differences in activity patterns between weekdays and weekends.
